@@ -97,7 +97,7 @@ Now you have successfully downloaded and prepared the sample input data in the N
 
 ### Case Study Map for the Provo River Basin, UT 
 
-![AWI_16_2853886_006](
+![Provo River Basin](https://github.com/arpita0911patel/NGIAB-CloudInfra/assets/28275758/dfe3bfab-9b1f-4271-880e-abf4d8db715f)
 
 **Running NGIAB**
 
