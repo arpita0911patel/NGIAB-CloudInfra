@@ -48,7 +48,7 @@ NGIAB provides a containerized and user-friendly solution for running the NextGe
 2. **Start Docker and Verify:** Follow the same steps as described for Mac to start Docker and verify its installation using the docker ps -a command in the terminal.
 
 - **Input Data:**
-  - **Download Sample Data:** Use the provided commands to download sample data for the Sipsey Fork case study.
+  - **Download Sample Data:** Use the provided commands to download sample data for the Provo River case study.
   - **To generate your own data:** Refer to the [NGIAB-datapreprocessor](https://github.com/AlabamaWaterInstitute/NGIAB_data_preprocess) for instructions on generating custom input data.
   - **To generate your own data and run using NGIAB:** Refer to the [ngen-datastream repository](https://github.com/CIROH-UA/ngen-datastream/tree/main) for instructions on generating custom input data.
 
