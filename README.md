@@ -1,165 +1,146 @@
-# NextGen In A Box (NGIAB)
+**NextGen In A Box (NGIAB)**
 
-"NextGen In A Box" (NGIAB) is a containerized version of the NextGen National Water Resources Modeling Framework.
+**Run the NextGen National Water Resources Modeling Framework locally with ease.**
+
+NGIAB provides a containerized and user-friendly solution for running the NextGen framework, allowing you to control inputs, configurations, and execution on your local machine.
+
+| | |
+| --- | --- |
+| ![alt text](https://ciroh.ua.edu/wp-content/uploads/2022/08/CIROHLogo_200x200.png) | Funding for this project was provided by the National Oceanic & Atmospheric Administration (NOAA), awarded to the Cooperative Institute for Research to Operations in Hydrology (CIROH) through the NOAA Cooperative Agreement with The University of Alabama (NA22NWS4320003). |
 
 [![ARM Build and push final image](https://github.com/CIROH-UA/NGIAB-CloudInfra/actions/workflows/docker_image_main_branch.yml/badge.svg)](https://github.com/CIROH-UA/NGIAB-CloudInfra/actions/workflows/docker_image_main_branch.yml)
 [![X86 Build and push final image](https://github.com/CIROH-UA/NGIAB-CloudInfra/actions/workflows/docker_image_main_x86.yml/badge.svg)](https://github.com/CIROH-UA/NGIAB-CloudInfra/actions/workflows/docker_image_main_x86.yml)
 
-<p align="center">
-<img src="https://github.com/CIROH-UA/NGIAB-CloudInfra/assets/54657/1a647024-67f8-489a-9f5e-86437449b6ff" width="300">
-</p>
-The NextGen Water Resources Modeling Framework (NextGen) is a data-centric framework developed by the NOAA OWP team to enhance the forecasting of flooding and drought, improve water resource management, and protect lives, property, and the environment.
+**Why NextGen In A Box?**
 
-The Cooperative Institute for Research to Operations in Hydrology (CIROH) along with Lynker has developed “NextGen In A Box” - ready-to-run, containerized and cloud-friendly version of NextGen framework, packaged with scripts to help prepare data and get you modeling more quickly. Leveraging open-source technical tools like Git, GitHub, CI/CD, Docker, NextGen In A Box fosters open research practices, enabling transparent and reproducible research outcomes within the NextGen framework.
+- **Run NextGen Locally:** Experiment with the framework and customize configurations on your local machine.
+- **Control Over Inputs:** Choose specific regions or basins for analysis and modify input data as needed.
+- **Simplified Setup:** Utilize Docker containers for effortless deployment, avoiding complex software installations.
+- **Open Research Practices:** Promote transparency and reproducibility through open-source tools like Git and GitHub.
 
-We are doing a case study : NWM run for Sipsey Fork, Black Warrior River
+**Case Study:** This repository demonstrates running NWM for Provo River Basin, UT 
 
-- We don’t want to run all of CONUS
-- We want to run NextGen locally
-- We want to have control over inputs / config.
-- How can we do it? Answer: NextGen In A Box (NGIAB)
+**Repository Contents:**
 
-This repository contains :
+- Dockerfile for running the NextGen Framework
+- Guide script (guide.sh) for easy execution
+- README with instructions and documentation
 
-- **Dockerfile** for running NextGen Framework (docker/Dockerfile\*)
-- Documentation of how to run the model. (README.md)
+**Getting Started**
 
-## Table of Contents
+**Prerequisites**
 
-- [Prerequisites:](#prerequisites-)
+**Windows:**
+1. **Install WSL:** Head over to Microsoft's official documentation and follow their comprehensive guide on installing WSL: https://learn.microsoft.com/en-us/windows/wsl/install
+2. **Install Docker Desktop:** Begin by downloading and installing Docker Desktop from the official website: https://docs.docker.com/desktop/install/windows-install/#install-docker-desktop-on-windows
+3. **Start Docker Desktop:** After installation, launch the Docker Desktop application.
+4. **Open WSL as Admin:** Right-click on the WSL icon and select "Run as Administrator".
+5. **Verify Installation:** In the WSL window, type the command docker ps -a to check if Docker is running correctly. This command should display a list of Docker containers.
 
-  - [Install docker](#install-docker-)
-  - [Install WSL on Windows](#Install-WSL-on-Windows-)
-  - [Download the input data in &#34;ngen-data&#34; folder from S3 bucket ](#download-the-input-data-in--ngen-data--folder-from-s3-bucket--)
-    - [Linux &amp; Mac](#linux---mac)
+**Mac:**
+1. **Install Docker Desktop:** Download and install Docker Desktop for Mac from: https://docs.docker.com/desktop/install/mac-install/
+2. **Start Docker Desktop:** Launch the Docker Desktop application once the installation is complete.
+3. **Open Terminal:** Open the Terminal application on your Mac.
+4. **Verify Installation:** Similar to Windows, use the command docker ps -a in the Terminal to verify Docker is functioning as expected.
 
-  * [Run NextGen-In-A-Box](#run-nextgen-in-a-box)
-    - [Clone CloudInfra repo](#clone-cloudinfra-repo)
-    - [How to run the model script?](#how-to-run-the-model-script-)
-    - [Output of the model script](#output-of-the-model-script)
+**Linux:**
+1. **Install Docker:** The installation process for Linux varies depending on your distribution. Refer to the official documentation for detailed instructions: https://docs.docker.com/desktop/install/linux-install/
+2. **Start Docker and Verify:** Follow the same steps as described for Mac to start Docker and verify its installation using the docker ps -a command in the terminal.
 
-## Prerequisites:
+- **Input Data:**
+  - **Download Sample Data:** Use the provided commands to download sample data for the Sipsey Fork case study.
+  - **To generate your own data:** Refer to the [NGIAB-datapreprocessor](https://github.com/AlabamaWaterInstitute/NGIAB_data_preprocess) for instructions on generating custom input data.
+  - **To generate your own data and run using NGIAB:** Refer to the [ngen-datastream repository](https://github.com/CIROH-UA/ngen-datastream/tree/main) for instructions on generating custom input data.
 
-### Install docker and validate docker is up:
+This section guides you through downloading and preparing the sample input data for the NextGen In A Box project.
 
-    - On*Windows*:
-        - [Install Docker Desktop on Windows](https://docs.docker.com/desktop/install/windows-install/#install-docker-desktop-on-windows)
-        - Once docker is installed, start Docker Destop.
-        - Open Powershell -> right click and `Run as an Administrator`
-        - Type `docker ps -a` to make sure docker is working.
+**Step 1: Create Project Directory**
 
-    - On*Mac*:
-        - [Install docker on Mac](https://docs.docker.com/desktop/install/mac-install/)
-        - Once docker is installed, start Docker Desktop.
-        - Open terminal app
-        - Type `docker ps -a` to make sure docker is working.
-
-    - On*Linux*:
-        - [Install docker on Linux](https://docs.docker.com/desktop/install/linux-install/)
-        - Follow similar steps as *Mac* for starting Docker and verifying the installation
-
-### Install WSL on Windows:
-
-1. Follow Microsofts latest [instructions](https://learn.microsoft.com/en-us/windows/wsl/install) to install wsl
-2. Once this is complete, follow the instructions for linux inside your wsl terminal.
-
-### Download the sample input data in "ngen-data" folder from S3 bucket :
-
-#### Linux ,Mac, WSL(Windows)
+- **Linux/Mac:** Open your terminal and go to your desired folder where you want to checkout repo and ngen-data folder and run the following commands:
+```bash
+mkdir -p NextGen/ngen-data
+```
 
 ```bash
-    mkdir -p NextGen/ngen-data
-    cd NextGen/ngen-data
-    wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-004/AWI_09_004.tar.gz
-    tar -xf AWI_09_004.tar.gz
-    # to rename your folder
-    mv AWI_09_004 my_data
+cd NextGen/ngen-data
 ```
-
-### How to Generate Your Own Input Data?
-
-Follow steps in our [ngen-datastream Repo](https://github.com/CIROH-UA/ngen-datastream/tree/main)
-
-### Case Study Map for the Sipsey Fork, Black Warrior River, AL
-
-![AGU_113060_03W_002](https://github.com/shahab122/NGIAB-CloudInfra/assets/28275758/cc7978da-081c-44ba-8877-0e235b5cca43)
-
-## Run NextGen In A Box
-
-### Clone NGIAB-CloudInfra repository
-
-Navigate to NextGen directory and clone the repository using below commands:
+- **WSL (Right click and run as Admin):** Open WSL with administrator privileges and execute:
+```bash
+cd /mnt/c/Users/<Folder>
+```
 
 ```bash
-    cd ../..
-    git clone https://github.com/CIROH-UA/NGIAB-CloudInfra.git
-    git checkout main
-    cd NGIAB-CloudInfra
+mkdir -p NextGen/ngen-data
 ```
-
-Once you are in _NGIAB-CloudInfra_ directory, you should see `guide.sh` in it. Now, we are ready to run the model using that script.
-
-### How to run the model script?
-
-#### WSL, Linux and Mac Steps:
-
-Follow below steps to run `guide.sh` script
 
 ```bash
-    ./guide.sh
+cd NextGen/ngen-data
+```
+**Step 2: Download Sample Data**
+
+- **Linux/Mac/Windows WSL:** Use wget to download the compressed data file:
+```bash
+wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-006/AWI_16_2853886_006.tar.gz
 ```
 
-- The script prompts the user to enter the file path for the input data directory where the forcing and config files are stored.
+**Step 3: Extract and Rename**
 
-Run the following command and copy the path value:
+- **All Platforms:** Extract the downloaded file and optionally rename the folder:
+```bash
+tar -xf AWI_16_2853886_006.tar.gz
+```
+### Below is Optional: Rename the folder
+```bash
+mv AWI_16_2853886_006 my_data
+```
+Now you have successfully downloaded and prepared the sample input data in the NextGen/ngen-data directory. Remember to replace "my_data" with your preferred folder name if you choose to rename it.
+
+### Case Study Map for the Provo River Basin, UT 
+
+![AWI_16_2853886_006](
+
+**Running NGIAB**
+
+1. **Clone the Repository:**
+Go to the folder created earlier during step #1 above
 
 ```bash
-    # navigate to the data folder you created earlier
-    cd NextGen/ngen-data/my_data
-    pwd
-    # and copy the path
-
+cd NextGen
+git clone https://github.com/CIROH-UA/NGIAB-CloudInfra.git
 ```
-
-where `<path>` is the location of the folder with your data in it.
-
-- The script sets the entered directory as the `HOST_DATA_PATH` variable and uses it to find all the catchment, nexus, and realization files using the `find` command.
-- Next, the user is asked whether to run NextGen or exit. If `run_NextGen` is selected, the script pulls the related image from the awiciroh DockerHub, based on the local machine's architecture:
-
-```
-For Mac with apple silicon (arm architecture), it pulls awiciroh/ciroh-ngen-image:latest.
-For x86 machines, it pulls awiciroh/ciroh-ngen-image:latest-x86.
-```
-
-- The user is then prompted to select whether they want to run the model in parallel or serial mode.
-- If the user selects parallel mode, the script uses the `mpirun` command to run the model and generates a partition file for the NGEN model.
-- If the user selects the catchment, nexus, and realization files they want to use.
-
-Example NGEN run command for parallel mode:
-
 ```bash
-/dmod/bin/partitionGenerator "/ngen/ngen/data/config/catchments.geojson" "/ngen/ngen/data/config/nexus.geojson" "partitions_2.json" "2" '' ''
-mpirun -n 2 /dmod/bin/ngen-parallel \
-/ngen/ngen/data/config/catchments.geojson "" \
-/ngen/ngen/data/config/nexus.geojson "" \
-/ngen/ngen/data/config/awi_simplified_realization.json \
-/ngen/partitions_2.json
+cd NGIAB-CloudInfra
 ```
 
-- If the user selects serial mode, the script runs the model directly.
-
-Example NGEN run command for serial mode:
-
+2. **Run the Guide Script:**
 ```bash
-/dmod/bin/ngen-serial \
-/ngen/ngen/data/config/catchments.geojson "" \
-/ngen/ngen/data/config/nexus.geojson "" \
-/ngen/ngen/data/config/awi_simplified_realization.json
+./guide.sh
 ```
 
-- After the model has finished running, the script prompts the user whether they want to continue.
-- If the user selects 1, the script opens an interactive shell.
-- If the user selects 2, then the script exits.
+3. **Follow the prompts:**
+    - **Input Data Path:** Enter the path to your downloaded or generated input data directory. (e.g NextGen/ngen-data/my_data)
+    - **Run Mode:** Choose between parallel or serial execution based on your preferences.
+      The script pulls the related image from the awiciroh DockerHub, based on the local machine's architecture:
+      ```
+      For Mac with apple silicon (arm architecture), it pulls awiciroh/ciroh-ngen-image:latest.
+      For x86 machines, it pulls awiciroh/ciroh-ngen-image:latest-x86.
+      ```
+      Example NGEN run command for parallel mode: 
+      ```bash
+      mpirun -n 10 /dmod/bin/ngen-parallel ./config/wb-2853886_subset.gpkg all ./config/wb-2853886_subset.gpkg all ./config/realization.json /ngen/ngen/data/partitions_10.json
+      ```
+      
+      Example NGEN run command for serial mode: 
+      ```bash
+      /dmod/bin/ngen-serial ./config/wb-2853886_subset.gpkg all ./config/wb-2853886_subset.gpkg all ./config/realization.json
+      ```
+    - **Select Files (automatically):** Script selects specific catchment, nexus, and realization files based on input data.
+    - After the model has finished running, the script prompts the user whether they want to continue.
+    - If the user selects 1, the script opens an interactive shell.
+    - If the user selects 2, then the script exits.
+
+**Output:**
+- Model outputs will be saved in the outputs folder within your input data directory. (e.g '.../NextGen/ngen-data/my_data/')
 
 After the `guide.sh` is finished, the user can decide to use the [Tethys Platform]() for visualization of the outputs (nexus and catchments). The script will pull the latest image of the [Ngiab visualizer tethys app](https://github.com/CIROH-UA/ngiab-client). It will also spin a GeoServer container in order to visualize the catchments layers (due to the size of the layer, this layer is visualized as with WMS service)
 
@@ -210,8 +191,11 @@ If the [Tethys Platform](https://www.tethysplatform.org/) is used to visualize t
 **Catchments Time Series**
 ![1715704450639](image/README/1715704450639.png)
 
-After the `guide.sh` is finished, the user can decide to use the [Tethys Platform]() for visualization of the outputs (nexus and catchments). The script will continue to run
+  
+**Additional Resources:**
 
-Using the *flowveldepth.csv files from the 'outputs' folder, the streamflow at the Clear Creek gauge (USGS site ID 02450825) is displayed here. Below is the 'Modelled' vs 'Observed' plot generated in MS Excel after *flowveldepth.csv files are post-processed using Python.
+- [Next Generation Water Modeling Engine and Framework Prototype](https://github.com/NOAA-OWP/ngen)
+- [NGIAB_data_preprocessor](https://github.com/AlabamaWaterInstitute/NGIAB_data_preprocess)
+- [ngen-datastream Repository](https://github.com/CIROH-UA/ngen-datastream/tree/main)
 
-![image](https://github.com/shahab122/NGIAB-CloudInfra/assets/28275758/58aaf351-8bb5-4b61-9f84-d9dd520053e5)
+
