@@ -15,7 +15,9 @@ RESET='\e[0m'
 
 # run the geoserver docker container
 _run_geoserver(){
-    _execute_command_geoserver docker run -it --rm -d -p $GEOSERVER_PORT_HOST:$GEOSERVER_PORT_CONTAINER \
+    _execute_command_geoserver docker run -it --rm -d \
+    --platform $PLATFORM \
+    -p $GEOSERVER_PORT_HOST:$GEOSERVER_PORT_CONTAINER \
     --env CORS_ENABLED=true \
     --env SKIP_DEMO_DATA=true \
     --network $DOCKER_NETWORK \
@@ -499,8 +501,23 @@ _run_tethys(){
 
 # Create tethys portal
 create_tethys_portal(){
-    echo -e "${YELLOW}Visualize outputs using the Tethys Platform (https://www.tethysplatform.org/)? (y/N, default: y):${RESET}"
-    read -r visualization_choice
+    while true; do
+        echo -e "${YELLOW}Visualize outputs using the Tethys Platform (https://www.tethysplatform.org/)? (y/N, default: y):${RESET}"
+        read -r visualization_choice
+        
+        # Default to 'y' if input is empty
+        if [[ -z "$visualization_choice" ]]; then
+            visualization_choice="y"
+        fi
+
+        # Check for valid input
+        if [[ "$visualization_choice" == [YyNn]* ]]; then
+            break
+        else
+            echo -e "${RED}Invalid choice. Please enter 'y' for yes, 'n' for no, or press Enter for default (yes).${RESET}"
+        fi
+    done
+    
     # Execute the command
     if [[ "$visualization_choice" == [Yy]* ]]; then
         echo -e "${GREEN}Setup Tethys Portal image...${RESET}"
@@ -521,10 +538,10 @@ create_tethys_portal(){
             _open_browser
             _pause_script_execution
         else
-            printf "${RED}Failed to prepare Tethys portal.${RESET}\n"
+            echo -e "${RED}Failed to prepare Tethys portal.${RESET}\n"
         fi
     else
-        printf "${CYAN}Skipping Tethys visualization setup.${RESET}\n"
+        echo -e "${CYAN}Skipping Tethys visualization setup.${RESET}\n"
     fi
 }
 
@@ -544,8 +561,8 @@ GEOSERVER_PORT_CONTAINER="8080"
 GEOSERVER_PORT_HOST="8181"
 DOCKER_NETWORK="tethys-network"
 APP_WORKSPACE_PATH="/usr/lib/tethys/apps/ngiab/tethysapp/ngiab/workspaces/app_workspace"
-TETHYS_IMAGE_NAME=awiciroh/tethys-ngiab:main
-GEOSERVER_IMAGE_NAME=docker.osgeo.org/geoserver:2.25.x
+TETHYS_IMAGE_NAME=awiciroh/tethys-ngiab:dev-r1
+GEOSERVER_IMAGE_NAME=gioelkin/geoserver:2.25.x
 DATA_FOLDER_PATH="$1"
 TETHYS_PERSIST_PATH="/var/lib/tethys_persist"
 CONFIG_FILE="$HOME/.host_data_path.conf"
@@ -559,7 +576,6 @@ fi
 
 
 check_last_path "$@"
-
 
 create_tethys_portal
 

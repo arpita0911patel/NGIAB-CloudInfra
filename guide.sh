@@ -204,6 +204,8 @@ if [ $Final_Outputs_Count -gt 0 ]; then
     if ! "$TETHYS_SCRIPT" "$ARG1"; then
         printf "Failed to visualize outputs in Tethys:"
     fi
+else
+    echo -e "No outputs to visualize."    
 fi
 
 echo -e "Thank you for running NextGen In A Box: National Water Model! Have a nice day!"

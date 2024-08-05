@@ -4,6 +4,10 @@
 
 NGIAB provides a containerized and user-friendly solution for running the NextGen framework, allowing you to control inputs, configurations, and execution on your local machine.
 
+<p align="center">
+<img src="https://github.com/CIROH-UA/NGIAB-CloudInfra/blob/main/image/README/ngiab.png" width="300">
+</p>
+
 | | |
 | --- | --- |
 | ![alt text](https://ciroh.ua.edu/wp-content/uploads/2022/08/CIROHLogo_200x200.png) | Funding for this project was provided by the National Oceanic & Atmospheric Administration (NOAA), awarded to the Cooperative Institute for Research to Operations in Hydrology (CIROH) through the NOAA Cooperative Agreement with The University of Alabama (NA22NWS4320003). |
@@ -166,6 +170,8 @@ Any copied files can be found here: /home/ubuntu/AWI_16_2853886_006/outputs
 Visualize outputs using the Tethys Platform (https://www.tethysplatform.org/)? (y/N, default: y):
 ```
 
+### How to run NGIAB Visualizer?
+
 If you have previous runs that you would like to use, you can
 also visualize them running the `./ViewOnTethys.sh` script.
 
@@ -191,6 +197,26 @@ If the [Tethys Platform](https://www.tethysplatform.org/) is used to visualize t
 **Catchments Time Series**
 ![1715704450639](https://github.com/CIROH-UA/NGIAB-CloudInfra/blob/main/image/README/1715704450639.png)
 
+### Build NGIAB locally
+
+Here is the commands that build ngiab image locally using docker build.
+
+```
+cd docker
+docker build -f Dockerfile.ngen-deps -t awiciroh/ngen-deps . --no-cache
+docker build -f Dockerfile.t-route -t awiciroh/t-route . --no-cache --build-arg TAG_NAME=latest
+docker build -f Dockerfile.ngen -t awiciroh/ngen . --no-cache --build-arg TAG_NAME=latest
+docker build -f Dockerfile -t awiciroh/ciroh-ngen-image:latest . --no-cache --build-arg TAG_NAME=latest
+```
+
+This image will not be pushed to Docker hub, and will stay in local machine.
+If you need to run guide.sh with the image built, image tag must match with your machine platform.
+
+For Arm64 architecture, use latest tag.\
+For X86 architecture, use latest-x86 tag.\
+For windows user, the build should be run as administrator.
+
+Note: buildx command cannot be used in local build.
   
 **Additional Resources:**
 
