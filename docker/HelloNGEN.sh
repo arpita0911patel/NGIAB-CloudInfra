@@ -30,7 +30,7 @@ auto_select_file() {
 # Finding files
 HYDRO_FABRIC_CATCHMENTS=$(find . -name "*.gpkg")
 HYDRO_FABRIC_NEXUS=$(find . -name "*.gpkg")
-NGEN_REALIZATIONS=$(find . -name "*realization*.json")
+NGEN_REALIZATIONS=$(find config/ -name "*realization*.json")
 
 # Auto-selecting files if only one is found
 selected_catchment=$(auto_select_file "$HYDRO_FABRIC_CATCHMENTS")
@@ -49,6 +49,11 @@ generate_partition() {
   /dmod/bin/partitionGenerator "$1" "$2" "partitions_$3.json" "$3" '' ''
 }
 
+generate_local_partition() {
+  python /dmod/utils/partitioning/local_only_partitions.py "$1" "$2" "."
+  # the last line printed by the script is the number of partitions actually generated
+  }
+
 if [ "$2" == "auto" ]
   then
     echo "AUTO MODE ENGAGED"
@@ -62,7 +67,12 @@ if [ "$2" == "auto" ]
     partitions=$(find . -name "*partitions_$procs.json")
     if [[ -z $partitions ]]; then
       echo "No partitions file found, generating..."
-      generate_partition "$selected_catchment" "$selected_nexus" "$procs"
+      if [ "$4" == "local" -o "$3" == "local" ]
+      then 
+        procs=$(generate_local_partition "$selected_catchment" "$procs"|tail -n 1)
+      else
+        generate_partition "$selected_catchment" "$selected_nexus" "$procs"
+      fi
     else
       echo "Found paritions file! "$partitions
     fi
@@ -80,20 +90,18 @@ select option in "${options[@]}"; do
   case $option in
     "Run NextGen model framework in serial mode"|"Run NextGen model framework in parallel mode")
       echo -e "\n"
-      n1=${selected_catchment:-$(read -p "Enter the hydrofabric catchment file path: " n1; echo "$n1")}
-      n2=${selected_nexus:-$(read -p "Enter the hydrofabric nexus file path: " n2; echo "$n2")}
-      n3=${selected_realization:-$(read -p "Enter the Realization file path: " n3; echo "$n3")}
+      n1=${selected_catchment:-$(read -erp "Enter the hydrofabric catchment file path: " n1; echo "$n1")}
+      n2=${selected_nexus:-$(read -erp "Enter the hydrofabric nexus file path: " n2; echo "$n2")}
+      n3=${selected_realization:-$(read -erp "Enter the Realization file path: " n3; echo "$n3")}
 
       echo -e "${GREEN}Selected files:\nCatchment: $n1\nNexus: $n2\nRealization: $n3${RESET}\n"
 
       if [ "$option" == "Run NextGen model framework in parallel mode" ]; then
         procs=$(nproc)
-        num_catchments=$(find forcings -name *.csv | wc -l)
-        if [ $num_catchments -lt $procs ]; then
-                procs=$num_catchments
-        fi
-        generate_partition "$n1" "$n2" "$procs"
-        run_command="mpirun -n $procs /dmod/bin/ngen-parallel $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json"
+        # The last line printed by the script is the number of partitions actually generated
+        num_partitions=$(generate_local_partition "$n1" "$procs"|tail -n 1)
+        echo "Generated $num_partitions partitions"
+        run_command="mpirun -n $num_partitions /dmod/bin/ngen-parallel $n1 all $n2 all $n3 $(pwd)/partitions_$num_partitions.json"
       else
         run_command="/dmod/bin/ngen-serial $n1 all $n2 all $n3"
       fi

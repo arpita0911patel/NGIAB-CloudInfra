@@ -1,6 +1,6 @@
 ---
 name: OnPremise Request Form
-about: This template is used to request the on-premise requests from CIROH members and partners utilizing the NextGen framework for the research projects. This form must be submitted by Principal Investigator (PI) of the project.
+about: PI leading CIROH projects may use this form to request CIROH on-premise requests (Pantarhei or NSF ACCESS Allocations). Access is available to all consortium members and partners.
 title: ''
 labels: on-prem
 assignees: ''
@@ -33,16 +33,23 @@ Specify the compute, storage, and network resources needed for the project. Be a
 
 4. Disk Space
 
+5. Pantarhei/NSF ACCESS Allocation (specify one)
+- More info about Pantarhei: [CIROH Pantarhei Documentation](https://docs.ciroh.org/docs/services/on-prem/Pantarhei/)
+- More info about NSF ACCESS: [ACCESS Resource Allocations](https://allocations.access-ci.org/resources)
 
-**5.	Timeline:** 
+**5. Working Group Detail**
+
+Working Group 1/2/3/4 (select one): 
+
+**6.	Timeline:** 
 Indicate the expected timeline for the project and when the resources will be needed. This information can help the infrastructure team plan and allocate resources accordingly.
  
 
 
-**6.	Security and Compliance Requirements:** 
+**7.	Security and Compliance Requirements:** 
 If there are any specific security or compliance requirements for the project, these should be clearly stated in the request. This will help ensure that the necessary security measures are in place for the project.
  
 
  
-**7.	Approval:** 
+**8.	Approval:** 
 Indicate the necessary approval processes or sign-offs required for the request.
