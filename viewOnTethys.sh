@@ -468,7 +468,7 @@ if [[ -z "$DATA_FOLDER_PATH" ]]; then
             read -e DATA_FOLDER_PATH
         fi
     else
-        echo -e "${INFO_MARK} ${BYellow}No previous configuration found${Color_Off}"
+        echo -e "${INFO_MARK} ${BYellow}No previous configuration found.${Color_Off}"
         echo -ne "  ${ARROW} Enter your input data directory path: "
         read -e DATA_FOLDER_PATH
     fi
