@@ -242,7 +242,7 @@ validate_directory() {
             echo -e "${CROSS_MARK} ${BRed}Missing required directory!${Color_Off}"
             return 1
         else
-            echo -e "${WARNING_MARK} ${BYellow}Not found (optional)${Color_Off}"
+            echo -e "${WARNING_MARK} ${BYellow}Optional directory not found. Continuing...${Color_Off}"
             return 0
         fi
     fi
