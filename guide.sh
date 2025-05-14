@@ -282,7 +282,7 @@ cleanup_folder() {
         echo -e "\n${UYellow}Cleanup options for $folder_name:${Color_Off}"
         choose_option "$folder_path" "$file_types"
     else
-        echo -e "  ${CHECK_MARK} ${BGreen}$folder_name is clean and ready for new simulations${Color_Off}"
+        echo -e "  ${CHECK_MARK} ${BGreen}$folder_name is clean and ready for new simulations!${Color_Off}"
     fi
 }
 
