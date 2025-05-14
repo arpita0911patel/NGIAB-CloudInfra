@@ -428,7 +428,7 @@ run_tethys() {
         echo -e "  ${CHECK_MARK} ${BGreen}Tethys container started successfully.${Color_Off}"
         return 0
     else
-        echo -e "  ${CROSS_MARK} ${BRed}Failed to start Tethys container${Color_Off}"
+        echo -e "  ${CROSS_MARK} ${BRed}Failed to start Tethys container.${Color_Off}"
         return 1
     fi
 }
