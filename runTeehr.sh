@@ -91,8 +91,8 @@ print_welcome_banner() {
     echo -e "\n\n"
     echo -e "\033[38;5;39m  ╔══════════════════════════════════════════════════════════════════════════════════════════╗\033[0m"
     echo -e "\033[38;5;39m  ║                                                                                          ║\033[0m"
-    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mCIROH: NextGen In A Box (NGIAB) - TEEHR Evaluation\033[38;5;39m                      ║\033[0m"
-    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mModel Performance Assessment Tool\033[38;5;39m                                        ║\033[0m"
+    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mCIROH: NextGen In A Box (NGIAB) - TEEHR Evaluation\033[38;5;39m                                      ║\033[0m"
+    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mModel Performance Assessment Tool\033[38;5;39m                                                       ║\033[0m"
     echo -e "\033[38;5;39m  ║                                                                                          ║\033[0m"
     echo -e "\033[38;5;39m  ╚══════════════════════════════════════════════════════════════════════════════════════════╝\033[0m"
     echo -e "\n"
@@ -172,14 +172,18 @@ check_and_read_config() {
     if [ -f "$CONFIG_FILE" ]; then
         LAST_PATH=$(cat "$CONFIG_FILE")
         echo -e "${INFO_MARK} Last used data directory: ${BBlue}$LAST_PATH${Color_Off}"
-        read -erp "  ${ARROW} Use this path? [Y/n]: " use_last_path
+        echo -e "  ${ARROW} Use this path? [Y/n]: "
+        echo -ne "\r\033[2A"  # Move up 2 lines
+        read -e use_last_path
+        echo -e "\033[2B"  # Move down 2 lines
         
         if [[ -z "$use_last_path" || "$use_last_path" =~ ^[Yy] ]]; then
             DATA_FOLDER_PATH="$LAST_PATH"
             check_if_data_folder_exists
             echo -e "  ${CHECK_MARK} ${BGreen}Using previously configured path${Color_Off}"
         else
-            read -erp "  ${ARROW} Enter your input data directory path: " DATA_FOLDER_PATH
+            echo -ne "  ${ARROW} Enter your input data directory path: "
+            read -e DATA_FOLDER_PATH
             check_if_data_folder_exists
             
             # Save the new path to the config file
@@ -188,7 +192,8 @@ check_and_read_config() {
         fi
     else
         echo -e "${INFO_MARK} ${BYellow}No previous configuration found${Color_Off}"
-        read -erp "  ${ARROW} Enter your input data directory path: " DATA_FOLDER_PATH
+        echo -ne "  ${ARROW} Enter your input data directory path: "
+        read -e DATA_FOLDER_PATH
         check_if_data_folder_exists
         
         # Save the path to the config file
@@ -237,7 +242,8 @@ if [[ "$run_teehr_choice" =~ ^[Yy] ]]; then
     
     echo -e "\n${ARROW} ${BWhite}System architecture detected: ${BCyan}$(uname -m)${Color_Off}"
     echo -e "  ${INFO_MARK} Recommended image tag: ${BCyan}$default_tag${Color_Off}"
-    read -erp "  ${ARROW} Specify TEEHR image tag [default: $default_tag]: " teehr_image_tag
+    echo -ne "  ${ARROW} Specify TEEHR image tag [default: $default_tag]: "
+    read -e teehr_image_tag
     
     if [[ -z "$teehr_image_tag" ]]; then
         teehr_image_tag="$default_tag"
