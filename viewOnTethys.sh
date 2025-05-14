@@ -475,7 +475,7 @@ if [[ -z "$DATA_FOLDER_PATH" ]]; then
     
     # Save the new path
     echo "$DATA_FOLDER_PATH" > "$CONFIG_FILE"
-    echo -e "  ${CHECK_MARK} ${BGreen}Path saved for future use${Color_Off}"
+    echo -e "  ${CHECK_MARK} ${BGreen}Path saved for future use.${Color_Off}"
 fi
 
 # Validate the directory
