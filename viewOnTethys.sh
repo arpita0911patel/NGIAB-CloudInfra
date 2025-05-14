@@ -374,7 +374,7 @@ add_model_run() {
         echo -e "  ${CHECK_MARK} ${BGreen}Model run registered successfully${Color_Off}"
         return 0
     else
-        echo -e "  ${CROSS_MARK} ${BRed}Failed to register model run${Color_Off}"
+        echo -e "  ${CROSS_MARK} ${BRed}Failed to register model run.${Color_Off}"
         return 1
     fi
 }
