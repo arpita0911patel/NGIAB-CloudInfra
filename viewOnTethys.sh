@@ -425,7 +425,7 @@ run_tethys() {
         "${TETHYS_REPO}:${TETHYS_TAG}"
         
     if [ $? -eq 0 ]; then
-        echo -e "  ${CHECK_MARK} ${BGreen}Tethys container started successfully${Color_Off}"
+        echo -e "  ${CHECK_MARK} ${BGreen}Tethys container started successfully.${Color_Off}"
         return 0
     else
         echo -e "  ${CROSS_MARK} ${BRed}Failed to start Tethys container${Color_Off}"
