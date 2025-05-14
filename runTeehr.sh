@@ -2,6 +2,7 @@
 
 # ======================================================================
 # CIROH: NextGen In A Box (NGIAB) - TEEHR Evaluation Tool
+# Version: 1.4.1
 # ======================================================================
 
 # Color definitions with enhanced palette
@@ -52,6 +53,7 @@ set -e
 CONFIG_FILE="$HOME/.host_data_path.conf"
 DATA_FOLDER_PATH=""
 IMAGE_NAME="awiciroh/ngiab-teehr"
+TEEHR_CONTAINER_PREFIX="teehr-evaluation"
 
 # Function for animated loading with gradient colors
 show_loading() {
@@ -102,17 +104,61 @@ print_welcome_banner() {
 # Function for error handling
 handle_error() {
     echo -e "\n${BG_Red}${BWhite} ERROR: $1 ${Color_Off}"
+    clean_up_resources
     exit 1
 }
 
 # Function to handle the SIGINT (Ctrl-C)
 handle_sigint() {
-    echo -e "\n${BG_Red}${BWhite} Operation cancelled by user. Exiting... ${Color_Off}"
+    echo -e "\n${BG_Red}${BWhite} Operation cancelled by user. Cleaning up... ${Color_Off}"
+    clean_up_resources
     exit 1
 }
 
-# Set up trap for Ctrl+C
-trap handle_sigint SIGINT
+# Clean up resources function
+clean_up_resources() {
+    echo -e "\n${ARROW} ${BYellow}Cleaning up resources...${Color_Off}"
+    
+    # Check if Docker daemon is running
+    if ! docker info >/dev/null 2>&1; then
+        echo -e "  ${CROSS_MARK} ${BRed}Docker daemon is not running, cannot clean up containers.${Color_Off}"
+        return 1
+    fi
+    
+    # Find and stop any running TEEHR containers
+    local running_containers=$(docker ps -q --filter "ancestor=$IMAGE_NAME")
+    if [ -n "$running_containers" ]; then
+        echo -e "  ${INFO_MARK} Stopping TEEHR containers..."
+        docker stop $running_containers >/dev/null 2>&1 || true
+    fi
+    
+    # Also check for containers with our prefix
+    local prefix_containers=$(docker ps -q --filter "name=$TEEHR_CONTAINER_PREFIX")
+    if [ -n "$prefix_containers" ]; then
+        echo -e "  ${INFO_MARK} Stopping additional TEEHR containers..."
+        docker stop $prefix_containers >/dev/null 2>&1 || true
+    fi
+    
+    # Remove any stopped containers matching our criteria
+    local all_containers=$(docker ps -a -q --filter "ancestor=$IMAGE_NAME")
+    if [ -n "$all_containers" ]; then
+        echo -e "  ${INFO_MARK} Removing TEEHR containers..."
+        docker rm $all_containers >/dev/null 2>&1 || true
+    fi
+    
+    # Also remove any with our prefix
+    local all_prefix_containers=$(docker ps -a -q --filter "name=$TEEHR_CONTAINER_PREFIX")
+    if [ -n "$all_prefix_containers" ]; then
+        echo -e "  ${INFO_MARK} Removing additional TEEHR containers..."
+        docker rm $all_prefix_containers >/dev/null 2>&1 || true
+    fi
+    
+    echo -e "  ${CHECK_MARK} ${BGreen}Cleanup completed${Color_Off}"
+}
+
+# Set up trap for Ctrl-C and EXIT
+trap handle_sigint INT
+trap clean_up_resources EXIT
 
 # Check if a directory exists
 check_if_data_folder_exists() {
@@ -238,8 +284,14 @@ if [[ "$run_teehr_choice" =~ ^[Yy] ]]; then
     
     show_loading "Initializing TEEHR evaluation" 2
     
-    # Run the TEEHR container
-    if ! docker run --rm -v "$DATA_FOLDER_PATH:/app/data" "${IMAGE_NAME}:${teehr_image_tag}"; then
+    # Create a unique container name
+    CONTAINER_NAME="${TEEHR_CONTAINER_PREFIX}-$(date +%s)"
+    
+    # First clean up any old containers
+    clean_up_resources
+    
+    # Run the TEEHR container with a name for easier cleanup
+    if ! docker run --name "$CONTAINER_NAME" --rm -v "$DATA_FOLDER_PATH:/app/data" "${IMAGE_NAME}:${teehr_image_tag}"; then
         handle_error "TEEHR evaluation failed"
     fi
     
@@ -256,5 +308,8 @@ fi
 
 echo -e "\n${BG_Blue}${BWhite} Thank you for using NGIAB! ${Color_Off}"
 echo -e "${INFO_MARK} For support, please email: ${UBlue}ciroh-it-support@ua.edu${Color_Off}\n"
+
+# Clean up any lingering resources before exit
+clean_up_resources
 
 exit 0
