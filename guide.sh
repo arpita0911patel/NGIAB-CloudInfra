@@ -96,11 +96,12 @@ print_welcome_banner() {
     echo -e "\n\n"
     echo -e "\033[38;5;39m  ╔══════════════════════════════════════════════════════════════════════════════════════════╗\033[0m"
     echo -e "\033[38;5;39m  ║                                                                                          ║\033[0m"
-    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mCIROH: NextGen In A Box (NGIAB)\033[38;5;39m                                         ║\033[0m"
-    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mAdvanced Hydrologic Modeling Tool\033[38;5;39m                                       ║\033[0m"
+    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mCIROH: NextGen In A Box (NGIAB)\033[38;5;39m                                                         ║\033[0m"
+    echo -e "\033[38;5;39m  ║  \033[1;38;5;231mAdvanced Hydrologic Modeling Tool\033[38;5;39m                                                       ║\033[0m"
     echo -e "\033[38;5;39m  ║                                                                                          ║\033[0m"
     echo -e "\033[38;5;39m  ╚══════════════════════════════════════════════════════════════════════════════════════════╝\033[0m"
     echo -e "\n"
+    echo -e "  ${ARROW} \033[1;38;5;39mVisit our website: \033[4;38;5;87mhttps://ngiab.ciroh.org\033[0m"
     echo -e "  ${INFO_MARK} \033[1;38;5;231mDeveloped by CIROH\033[0m"
     echo -e "\n"
     sleep 1
@@ -176,16 +177,19 @@ echo -e "\n${INFO_MARK} ${BWhite}Please specify a directory containing these com
 if [ -f "$CONFIG_FILE" ]; then
     LAST_PATH=$(cat "$CONFIG_FILE")
     echo -e "${INFO_MARK} Last used data directory: ${BBlue}$LAST_PATH${Color_Off}"
-    read -erp "  ${ARROW} Use the same path? [Y/n]: " use_last_path
+    echo -ne "  ${ARROW} Use the same path? [Y/n]: "
+    read -e use_last_path
     if [[ "$use_last_path" != [Nn]* ]]; then
         HOST_DATA_PATH=$LAST_PATH
         echo -e "  ${CHECK_MARK} Using previously configured path"
     else
-        read -erp "  ${ARROW} Enter your input data directory path: " HOST_DATA_PATH
+        echo -ne "  ${ARROW} Enter your input data directory path: "
+        read -e HOST_DATA_PATH
     fi
 else
     echo -e "${INFO_MARK} ${BYellow}No previous configuration found${Color_Off}"
-    read -erp "  ${ARROW} Enter your input data directory path: " HOST_DATA_PATH
+    echo -ne "  ${ARROW} Enter your input data directory path: "
+    read -e HOST_DATA_PATH
 fi
 
 # Handle paths with special characters properly

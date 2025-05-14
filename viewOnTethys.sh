@@ -101,7 +101,7 @@ print_welcome_banner() {
     echo -e "\n"
     echo -e "${BBlue}=================================================${Color_Off}"
     echo -e "${BBlue}|  CIROH: NextGen In A Box (NGIAB) - Tethys     |${Color_Off}"
-    echo -e "${BBlue}|  Interactive Model Output Visualization        |${Color_Off}"
+    echo -e "${BBlue}|  Interactive Model Output Visualization       |${Color_Off}"
     echo -e "${BBlue}=================================================${Color_Off}"
     echo -e "\n${INFO_MARK} ${BWhite}Developed by CIROH${Color_Off}\n"
     sleep 1
@@ -455,17 +455,22 @@ if [[ -z "$DATA_FOLDER_PATH" ]]; then
     if [ -f "$CONFIG_FILE" ]; then
         LAST_PATH=$(cat "$CONFIG_FILE")
         echo -e "${INFO_MARK} Last used data directory: ${BBlue}$LAST_PATH${Color_Off}"
-        read -erp "  ${ARROW} Use this path? [Y/n]: " use_last_path
+        echo -e "  ${ARROW} Use this path? [Y/n]: "
+        echo -ne "\r\033[2A"  # Move up 2 lines
+        read -e use_last_path
+        echo -e "\033[2B"  # Move down 2 lines
         
         if [[ -z "$use_last_path" || "$use_last_path" =~ ^[Yy] ]]; then
             DATA_FOLDER_PATH="$LAST_PATH"
             echo -e "  ${CHECK_MARK} ${BGreen}Using previously configured path${Color_Off}"
         else
-            read -erp "  ${ARROW} Enter your input data directory path: " DATA_FOLDER_PATH
+            echo -ne "  ${ARROW} Enter your input data directory path: "
+            read -e DATA_FOLDER_PATH
         fi
     else
         echo -e "${INFO_MARK} ${BYellow}No previous configuration found${Color_Off}"
-        read -erp "  ${ARROW} Enter your input data directory path: " DATA_FOLDER_PATH
+        echo -ne "  ${ARROW} Enter your input data directory path: "
+        read -e DATA_FOLDER_PATH
     fi
     
     # Save the new path
