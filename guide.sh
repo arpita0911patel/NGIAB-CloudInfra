@@ -308,7 +308,7 @@ choose_option() {
                 break
                 ;;
             "Continue with existing files")
-                echo -e "  ${INFO_MARK} ${BCyan}Proceeding with existing files${Color_Off}"
+                echo -e "  ${INFO_MARK} ${BCyan}Proceeding with existing files.${Color_Off}"
                 break
                 ;;
             "Exit")
