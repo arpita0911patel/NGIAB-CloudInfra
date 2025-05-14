@@ -279,7 +279,7 @@ cleanup_folder() {
     
     if [ "$file_count" -gt 0 ]; then
         echo -e "  ${WARNING_MARK} Found ${BYellow}$file_count${Color_Off} existing files"
-        echo -e "\n${UYellow}Cleanup Options for $folder_name:${Color_Off}"
+        echo -e "\n${UYellow}Cleanup options for $folder_name:${Color_Off}"
         choose_option "$folder_path" "$file_types"
     else
         echo -e "  ${CHECK_MARK} ${BGreen}$folder_name is clean and ready for new simulations${Color_Off}"
