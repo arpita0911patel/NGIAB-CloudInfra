@@ -137,7 +137,7 @@ clean_up_resources() {
         docker stop $ngen_containers >/dev/null 2>&1
     fi
     
-    echo -e "  ${CHECK_MARK} ${BGreen}Cleanup completed${Color_Off}"
+    echo -e "  ${CHECK_MARK} ${BGreen}Cleanup completed.${Color_Off}"
 }
 
 # Function for error handling
