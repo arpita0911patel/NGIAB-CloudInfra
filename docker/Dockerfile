@@ -14,6 +14,12 @@ RUN dnf update -y && \
     vim libgfortran sqlite \
     bzip2 expat udunits2 zlib \
     mpich hdf5 netcdf netcdf-fortran netcdf-cxx netcdf-cxx4-mpich
+# Install UV and setup cargo bin for rust tools (uv and cargo)
+ENV PATH="/root/.cargo/bin:${PATH}"
+ENV UV_INSTALL_DIR=/root/.cargo/bin
+ENV UV_COMPILE_BYTECODE=1
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv self update
 
 FROM base AS build_base
 # no dnf update to keep devel packages consistent with versions installed in base
@@ -33,7 +39,7 @@ FROM build_base AS boost_build
 RUN wget https://archives.boost.io/release/1.79.0/source/boost_1_79_0.tar.gz
 RUN tar -xzf boost_1_79_0.tar.gz
 WORKDIR /boost_1_79_0
-RUN ./bootstrap.sh && ./b2 && ./b2 headers
+RUN ./bootstrap.sh && ./b2 headers
 ENV BOOST_ROOT=/boost_1_79_0
 
 
@@ -46,7 +52,7 @@ ENV FC=gfortran NETCDF=/usr/lib64/gfortran/modules/
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 WORKDIR /ngen/
-RUN pip3 install uv && uv venv
+RUN uv venv
 ENV PATH="/ngen/.venv/bin:$PATH"
 ## make sure clone isn't cached if repo is updated
 ADD https://api.github.com/repos/${TROUTE_REPO}/git/refs/heads/${TROUTE_BRANCH} /tmp/version.json
@@ -159,7 +165,26 @@ RUN mv /ngen/ngen /ngen/ngen_src
 WORKDIR /ngen
 ENTRYPOINT ["./HelloNGEN.sh"]
 
+FROM build_base AS lstm_weights
+RUN git clone --depth=1 --branch example_weights https://github.com/ciroh-ua/lstm.git /lstm_weights
+# add the rust weight conversion
+RUN uv run --with pyyaml --with numpy --with torch --extra-index-url https://download.pytorch.org/whl/cpu \
+    https://raw.githubusercontent.com/CIROH-UA/rust-lstm-1025/refs/tags/v0.1.0/scripts/convert.py \
+    all /lstm_weights/trained_neuralhydrology_models/
+# replace the relative path with the absolute path in the model config files
+RUN shopt -s globstar
+RUN sed -i 's|\.\.|/ngen/ngen/extern/lstm|g' /lstm_weights/trained_neuralhydrology_models/**/config.yml
 
+
+FROM build_base AS burn_lstm
+RUN dnf install -y clang
+WORKDIR /build
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+RUN git clone --depth=1 https://github.com/aaraney/bmi-rs
+RUN git clone --depth=1 --branch v0.1.0 https://github.com/ciroh-ua/rust-lstm-1025
+WORKDIR /build/rust-lstm-1025
+RUN cargo build --release
 
 FROM base AS final
 
@@ -172,10 +197,7 @@ COPY --from=troute_build /ngen/t-route/src/troute-*/dist/*.whl /tmp/
 
 RUN ln -s /dmod/bin/ngen /usr/local/bin/ngen
 
-ENV UV_INSTALL_DIR=/root/.cargo/bin
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:${PATH}"
-RUN uv self update && uv venv && \
+RUN uv venv && \
     uv pip install --no-cache-dir /tmp/*.whl netCDF4==1.6.3
 # Clean up some stuff, this doesn't make the image any smaller
 RUN rm -rf /tmp/*.whl
@@ -199,6 +221,13 @@ ENV PATH="/ngen/.venv/bin:${PATH}"
 # Install lstm - the extra index url installs cpu-only pytorch which is ~6gb smaller
 COPY --from=ngen_clone /ngen/ngen/extern/lstm/lstm /ngen/ngen/extern/lstm
 RUN uv pip install --no-cache-dir /ngen/ngen/extern/lstm --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Replace the noaa-owp example weights with jmframes
+RUN rm -rf /ngen/ngen/extern/lstm/trained_neuralhydrology_models
+COPY --from=lstm_weights /lstm_weights/trained_neuralhydrology_models /ngen/ngen/extern/lstm/trained_neuralhydrology_models
+
+# Copy the rust version of the lstm over.
+COPY --from=burn_lstm /build/rust-lstm-1025/target/release/librust_lstm_1025.so /dmod/shared_libs/librust_lstm_1025.so
 
 ## add some metadata to the image
 COPY --from=troute_build /tmp/troute_url /ngen/troute_url
